@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latihan Soal TKA Matematika - 40 Soal</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text: #1f2937;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        h1, h2 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 25px;
+        }
+        .question-card {
+            display: none;
+            margin-bottom: 20px;
+        }
+        .question-card.active {
+            display: block;
+        }
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .option-btn {
+            background-color: #f9fafb;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .option-btn:hover {
+            background-color: #eff6ff;
+            border-color: var(--primary);
+        }
+        .option-btn.selected {
+            background-color: #dbeafe;
+            border-color: var(--primary);
+            font-weight: bold;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        button.nav-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button.nav-btn:hover {
+            background-color: var(--primary-hover);
+        }
+        button.nav-btn:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+        #result-container {
+            display: none;
+            text-align: center;
+        }
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .review-list {
+            text-align: left;
+            margin-top: 30px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+        }
+        .review-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f9fafb;
+        }
+        .correct-ans {
+            color: var(--success);
+            font-weight: bold;
+        }
+        .wrong-ans {
+            color: var(--danger);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="quiz-app">
+    <div id="intro-container">
+        <h1>Simulasi TKA Matematika</h1>
+        <p class="subtitle">Berisi 40 soal pilihan ganda. Kerjakan dengan teliti.</p>
+        <div style="text-align: center; margin-top: 40px;">
+            <button class="nav-btn" onclick="startQuiz()">Mulai Latihan</button>
+        </div>
+    </div>
+
+    <div id="quiz-container" style="display: none;">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+        <div id="question-header" style="font-weight: bold; color: var(--primary); margin-bottom: 10px;"></div>
+        <div id="questions-wrapper"></div>
+        
+        <div class="navigation">
+            <button class="nav-btn" id="prev-btn" onclick="changeQuestion(-1)">Sebelumnya</button>
+            <button class="nav-btn" id="next-btn" onclick="changeQuestion(1)">Selanjutnya</button>
+            <button class="nav-btn" id="submit-btn" style="display: none; background-color: var(--success);" onclick="showResult()">Selesai & Lihat Hasil</button>
+        </div>
+    </div>
+
+    <div id="result-container">
+        <h2>Hasil Latihan Anda</h2>
+        <div class="score-circle" id="final-score">0</div>
+        <p id="result-summary"></p>
+        <button class="nav-btn" onclick="location.reload()">Ulangi Latihan</button>
+        
+        <div class="review-list" id="review-list">
+            <h3>Review Jawaban:</h3>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Data Soal 1 - 40
+    const questionsData = [
+        { q: "Hasil dari operasi bilangan berpangkat (7^3 × 7^-4) / 7^2 adalah...[cite: 1]", options: ["7^-9", "7^-6", "7^-3", "7"], answer: 2 },
+        { q: "Suhu lemari pendingin yang direkomendasikan untuk menyimpan daging ayam adalah -19°C. Nilai tersebut sama dengan...[cite: 1]", options: ["18 derajat di bawah 0°C", "18 derajat di atas 0°C", "19 derajat di bawah 0°C", "19 derajat di atas 0°C"], answer: 2 },
+        { q: "Diketahui bentuk aljabar 2ab - b^2 + 3a^2b + ab^2 - 5. Manakah pernyataan yang benar terkait konstanta pada aljabar tersebut?[cite: 1]", options: ["Konstantanya adalah 2", "Konstantanya adalah -1", "Konstantanya adalah -5", "Konstantanya adalah 5"], answer: 2 },
+        { q: "Penyelesaian dari pertidaksamaan 3x + 17 ≤ 7 - 2x adalah...[cite: 1]", options: ["x ≤ -2", "x ≥ -2", "x ≤ 2", "x ≥ 2"], answer: 0 },
+        { q: "Garis AB dan PQ berpotongan di titik Q. Jika dua sudut yang saling bertolak belakang besarnya 72° dan (4x+12)°, berapakah nilai x yang tepat?[cite: 1]", options: ["15°", "24°", "69°", "96°"], answer: 0 },
+        { q: "Berapa rumus fungsi f(x) yang tepat apabila diketahui pasangan berurutan paket kuota (GB) dan harga: (5, 14.000), (10, 23.000), (20, 41.000)?[cite: 1]", options: ["f(x) = 2.000x + 4.000", "f(x) = 2.000x + 1.000", "f(x) = 1.800x + 9.000", "f(x) = 1.800x + 5.000"], answer: 3 },
+        { q: "Sebuah paket berisi 20 kotak (8 Saka, 12 Kirana). Riana sudah mengambil 3 kotak (1 Saka, 2 Kirana). Berapa peluang Santi mendapatkan Saka pada pengambilan berikutnya?[cite: 1]", options: ["7/20", "8/20", "8/17", "7/17"], answer: 3 },
+        { q: "Persegi panjang yang lebih besar memiliki luas 320 cm² dan sebangun dengan persegi panjang kecil yang panjangnya 5 cm. Jika lebar persegi panjang kecil adalah 4 cm, keliling persegi panjang kecil adalah...[cite: 1]", options: ["9 cm", "18 cm", "20 cm", "72 cm"], answer: 1 },
+        { q: "Dua segitiga kongruen PQR dan KLM. Segitiga PQR ditranslasikan oleh T=(-4, -2). Bayangan segitiga PQR dan KLM akan saling...[cite: 1]", options: ["tegak lurus", "berpotongan", "sejajar", "berhimpit"], answer: 3 },
+        { q: "Sisa minyak di tangki 1.160 liter akan dikemas ke dalam jeriken berukuran 5 liter. Banyak kemasan jeriken yang terisi penuh adalah...[cite: 1]", options: ["230 jeriken", "232 jeriken", "332 jeriken", "532 jeriken"], answer: 1 },
+        { q: "Terdapat tiga bilangan: (7^2 - 1), (4 × 18 - 12), dan (3^2 × 8). Berapakah FPB dari ketiga bilangan tersebut?[cite: 2]", options: ["12", "18", "24", "36"], answer: 2 },
+        { q: "Sepuluh pemuda menyewa villa dengan patungan Rp300.000 per orang. Jika 2 orang batal ikut, berapa biaya yang harus dibayar masing-masing pemuda yang tersisa?[cite: 2]", options: ["Rp375.000", "Rp360.000", "Rp250.000", "Rp240.000"], answer: 0 },
+        { q: "Diketahui persamaan 2(3x - 5) + 4 = 4x + 8. Jika m adalah penyelesaiannya, maka nilai dari 5m - 3 adalah...[cite: 2]", options: ["12", "18", "27", "32"], answer: 3 },
+        { q: "Lahan 19,6 m × 10,2 m dijadikan parkir. Jika 1 mobil butuh ruang 12 m², maksimal mobil yang tertampung adalah...[cite: 2]", options: ["15 mobil", "16 mobil", "17 mobil", "20 mobil"], answer: 1 },
+        { q: "Rata-rata nilai matematika kelas IX A adalah 76. Pernyataan yang pasti benar adalah...[cite: 2]", options: ["Sebagian besar siswa nilainya pasti 76", "Jika ada siswa bernilai < 76, pasti ada yang > 76", "Semua siswa lulus", "Tidak ada yang remedial"], answer: 1 },
+        { q: "UMKM memproduksi tas. Bulan pertama 50 tas, bulan kedua 60 tas, dan selalu bertambah 10 tas. Total pesanan selama 12 bulan adalah...[cite: 2]", options: ["1.100 tas", "1.200 tas", "1.260 tas", "1.320 tas"], answer: 2 },
+        { q: "Dalam sebuah permainan, menembak angka ganjil: ditambah 1 lalu dikali 50 poin. Jika pemain menembak angka 7, poin yang diperoleh adalah...[cite: 2]", options: ["300 poin", "350 poin", "400 poin", "500 poin"], answer: 2 },
+        { q: "Printer laser mencetak 30 halaman per menit. Waktu untuk mencetak 150 halaman adalah...[cite: 2]", options: ["3 menit", "4 menit", "5 menit", "6 menit"], answer: 2 },
+        { q: "Cakram putar dengan angka 1 sampai 10 diputar. Peluang menunjuk faktor prima dari 10 (2 dan 5) adalah...[cite: 2]", options: ["1/5", "3/10", "2/5", "1/2"], answer: 0 },
+        { q: "Volume air di wadah balok adalah 3.724 cm³. Jika panjang wadah 14 cm dan lebarnya 14 cm (asumsi alas persegi), ketinggian air adalah...[cite: 2]", options: ["12 cm", "19 cm", "21 cm", "25 cm"], answer: 1 },
+        { q: "Dalam tes 40 soal, Benar = 4, Salah = -1, Kosong = 0. Rita menjawab 35 soal, di mana 30 soal benar. Skor Rita adalah...[cite: 3]", options: ["115", "120", "130", "140"], answer: 0 },
+        { q: "Toko memiliki 42 botol sirup jeruk dan 63 botol sirup stroberi. Botol akan ditata merata ke dalam rak. Maksimal rak yang diperlukan adalah...[cite: 3]", options: ["7 rak", "9 rak", "14 rak", "21 rak"], answer: 3 },
+        { q: "Dini membuat cupcake dengan resep 0,75 kg tepung untuk 6 porsi. Jika ia punya 3,75 kg tepung, porsi cupcake yang dibuat adalah...[cite: 3]", options: ["24 porsi", "27 porsi", "30 porsi", "48 porsi"], answer: 2 },
+        { q: "Pak Deni mengecat dinding 4,6 m × 2,8 m. Jika 1 kaleng cat menutupi 6 m², minimal kaleng yang harus dibeli adalah...[cite: 3]", options: ["1 kaleng", "2 kaleng", "3 kaleng", "4 kaleng"], answer: 2 },
+        { q: "Proyek diselesaikan 12 pekerja dalam 20 hari. Jika ingin selesai 15 hari, banyak pekerja tambahan adalah...[cite: 3]", options: ["3 orang", "4 orang", "9 orang", "16 orang"], answer: 1 },
+        { q: "Diketahui f(x) = px + q. Jika f(-3) = -12 dan f(5) = 4, maka rumus fungsinya adalah...[cite: 3]", options: ["f(x) = 2x - 6", "f(x) = 2x + 6", "f(x) = 3x - 3", "f(x) = -2x - 6"], answer: 0 },
+        { q: "Paman berjalan dari A ke B (200m), lalu B ke C (240m), dan C ke D (120m). Jika lintasan lurus dan siku-siku, jarak terdekat A ke D (menggunakan Pythagoras beruntun) biasanya setara dengan...[cite: 3]", options: ["240 meter", "320 meter", "400 meter", "560 meter"], answer: 2 },
+        { q: "Tabungan Arya: Agt=60rb, Sep=65rb, Okt=70rb, dst (bertambah 5rb). Jumlah tabungan sampai April 2025 (9 bulan) adalah...[cite: 3]", options: ["Rp580.000", "Rp660.000", "Rp720.000", "Rp770.000"], answer: 2 },
+        { q: "Dua buah dadu dilambungkan. Peluang muncul kedua mata dadu berjumlah 7 adalah...[cite: 3]", options: ["5/18", "1/6", "1/9", "1/12"], answer: 1 },
+        { q: "Rata-rata 15 data adalah 18. Rata-rata 10 data pertama 15, dan 3 data selanjutnya 25. Jika data ke-15 = 2x data ke-14, maka nilai data ke-15 adalah...[cite: 3]", options: ["25", "30", "45", "60"], answer: 1 },
+        { q: "Hanan membawa buah dalam mobil kapasitas 1 ton (1000 kg). Ada 10 kotak merah @25 kg. Sisa muatan untuk kotak biru @50 kg adalah sebanyak...[cite: 3]", options: ["10 kotak", "15 kotak", "20 kotak", "25 kotak"], answer: 1 },
+        { q: "Gaji staf pada bulan ke-5 adalah Rp850.000 dan bulan ke-8 Rp1.150.000. Pertambahan gaji setiap bulannya adalah...[cite: 4]", options: ["Rp50.000", "Rp100.000", "Rp150.000", "Rp200.000"], answer: 1 },
+        { q: "Keliling kebun persegipanjang 42 meter dengan ukuran panjang (3x-2) m dan lebar (x+3) m. Luas kebun tersebut adalah...[cite: 4]", options: ["95,76 m²", "97,28 m²", "99,84 m²", "104 m²"], answer: 3 },
+        { q: "Satu tahun cahaya adalah jarak tempuh 186.000 mil per detik selama satu tahun. Galaksi berjarak 2,5 juta tahun cahaya, maka waktu yang diperlukan adalah 2,5 juta tahun cahaya, bukan mil per detik. (Asumsi pertanyaan)...[cite: 4]", options: ["2,5 x 10^6 tahun", "1,86 x 10^5 tahun", "4,65 x 10^11 tahun", "4,65 x 10^30 tahun"], answer: 0 },
+        { q: "Taman persegi seluas 196 m². Panjang kabel yang menutupi satu diagonal penuh taman adalah (√2 = 1,4)...[cite: 4]", options: ["9,8 meter", "14,0 meter", "19,6 meter", "28,0 meter"], answer: 2 },
+        { q: "Dari fungsi f(x) = ax + b, diketahui f(2) = 3 dan f(5) = 9. Rumus fungsi yang benar adalah...[cite: 4]", options: ["f(x) = x + 1", "f(x) = 2x - 1", "f(x) = 2x + 1", "f(x) = 3x - 3"], answer: 1 },
+        { q: "Pertumbuhan kecambah: hari ke-1 = 6 cm, hari ke-2 = 10 cm, hari ke-3 = 14 cm. Panjang di hari ke-10 adalah...[cite: 4]", options: ["42 cm", "44 cm", "46 cm", "50 cm"], answer: 0 },
+        { q: "Diketahui volume kerucut berbanding dengan bola jika jari-jari sama dan tinggi kerucut = jari-jari. Perbandingan volume kerucut dan bola adalah...[cite: 4]", options: ["1 : 2", "1 : 3", "1 : 4", "2 : 3"], answer: 2 },
+        { q: "Harga bata ringan (hebel) 1 m³ adalah Rp615.000. Jika 1 m³ memuat 111 bata, harga satuan hebel tersebut mendekati...[cite: 4]", options: ["Rp4.540", "Rp5.540", "Rp6.540", "Rp7.900"], answer: 1 },
+        { q: "Zulaikha membeli kue. Diketahui 1 kotak banana cake dan 3 cup brownies cake seharga Rp54.000. Jika banana cake lebih mahal, harga 1 brownies cup kemungkinan adalah...[cite: 4]", options: ["Rp6.000", "Rp10.000", "Rp12.000", "Rp15.000"], answer: 0 }
+    ];
+
+    let currentQuestion = 0;
+    let userAnswers = new Array(40).fill(null);
+
+    const introContainer = document.getElementById("intro-container");
+    const quizContainer = document.getElementById("quiz-container");
+    const resultContainer = document.getElementById("result-container");
+    const questionsWrapper = document.getElementById("questions-wrapper");
+    const prevBtn = document.getElementById("prev-btn");
+    const nextBtn = document.getElementById("next-btn");
+    const submitBtn = document.getElementById("submit-btn");
+    const progressBar = document.getElementById("progress");
+
+    function startQuiz() {
+        introContainer.style.display = "none";
+        quizContainer.style.display = "block";
+        buildQuestions();
+        showQuestion(0);
+    }
+
+    function buildQuestions() {
+        questionsData.forEach((q, index) => {
+            const card = document.createElement("div");
+            card.className = "question-card";
+            card.id = `q-${index}`;
+            
+            const qText = document.createElement("div");
+            qText.className = "question-text";
+            qText.innerHTML = `${index + 1}. ${q.q}`;
+            
+            const optionsDiv = document.createElement("div");
+            optionsDiv.className = "options";
+            
+            q.options.forEach((opt, optIndex) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.innerHTML = `${String.fromCharCode(65 + optIndex)}. ${opt}`;
+                btn.onclick = () => selectOption(index, optIndex, btn);
+                optionsDiv.appendChild(btn);
+            });
+
+            card.appendChild(qText);
+            card.appendChild(optionsDiv);
+            questionsWrapper.appendChild(card);
+        });
+    }
+
+    function selectOption(qIndex, optIndex, btnElement) {
+        userAnswers[qIndex] = optIndex;
+        
+        const currentCard = document.getElementById(`q-${qIndex}`);
+        const allBtns = currentCard.querySelectorAll(".option-btn");
+        
+        allBtns.forEach(btn => btn.classList.remove("selected"));
+        btnElement.classList.add("selected");
+    }
+
+    function showQuestion(index) {
+        document.querySelectorAll(".question-card").forEach(card => card.classList.remove("active"));
+        document.getElementById(`q-${index}`).classList.add("active");
+        
+        document.getElementById("question-header").innerText = `Soal ${index + 1} dari 40`;
+        progressBar.style.width = `${((index + 1) / 40) * 100}%`;
+
+        prevBtn.disabled = index === 0;
+        
+        if (index === 39) {
+            nextBtn.style.display = "none";
+            submitBtn.style.display = "inline-block";
+        } else {
+            nextBtn.style.display = "inline-block";
+            submitBtn.style.display = "none";
+        }
+    }
+
+    function changeQuestion(direction) {
+        currentQuestion += direction;
+        showQuestion(currentQuestion);
+    }
+
+    function showResult() {
+        // Cek apakah ada yang belum diisi (Opsional, saat ini dibiarkan tetap submit)
+        let score = 0;
+        const reviewList = document.getElementById("review-list");
+        reviewList.innerHTML = "<h3>Review Jawaban:</h3>";
+
+        questionsData.forEach((q, index) => {
+            const isCorrect = userAnswers[index] === q.answer;
+            if (isCorrect) score++;
+
+            const revItem = document.createElement("div");
+            revItem.className = "review-item";
+            
+            const status = isCorrect 
+                ? `<span class="correct-ans">✔ Benar</span>` 
+                : `<span class="wrong-ans">✘ Salah (Kunci: ${String.fromCharCode(65 + q.answer)})</span>`;
+            
+            const userAnsText = userAnswers[index] !== null 
+                ? String.fromCharCode(65 + userAnswers[index]) 
+                : "Tidak dijawab";
+
+            revItem.innerHTML = `
+                <p><strong>Soal ${index + 1}:</strong> ${q.q}</p>
+                <p>Jawaban Anda: ${userAnsText} &mdash; ${status}</p>
+            `;
+            reviewList.appendChild(revItem);
+        });
+
+        const finalScore = Math.round((score / 40) * 100);
+        
+        quizContainer.style.display = "none";
+        resultContainer.style.display = "block";
+        
+        document.getElementById("final-score").innerText = finalScore;
+        document.getElementById("result-summary").innerText = `Anda menjawab benar ${score} dari 40 soal.`;
+    }
+</script>
+
+</body>
+</html>
+
+```
